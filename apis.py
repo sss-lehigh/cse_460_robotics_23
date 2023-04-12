@@ -44,8 +44,6 @@ class Position:
             if self.robot_id in positions:
                 #print('Last position', positions[robot_id], ' rotation', rotations[robot_id])
                 return (positions[self.robot_id], rotations[self.robot_id])
-                
-            
 
 class Robot:
 
