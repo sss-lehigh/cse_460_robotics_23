@@ -1,3 +1,4 @@
 *pycache*
 *egg-info
 /venv
+.ipynb_checkpoints
