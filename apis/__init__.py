@@ -8,3 +8,4 @@ from Functions import *
 from Position import *
 from Robot import *
 from Discretization import *
+from ObstacleDetector import *

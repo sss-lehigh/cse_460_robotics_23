@@ -59,5 +59,7 @@ class Discretization:
         return [self.G.nodes[p]['pos'] for p in path]
     
     def remove_node(self, node):
-        self.G.remove_node(node)
-
+        #self.G.remove_node(node)
+        for edge in self.G.edges:
+            if edge[0] == node or edge[1] == node:
+                self.G.edges[edge]['weight'] = len(self.G.nodes) * 2.0
