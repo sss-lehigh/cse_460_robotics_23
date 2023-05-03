@@ -6,7 +6,7 @@ positions = {}
 rotations = {}
 
 # This is a callback function that gets connected to the NatNet client. It is called once per rigid body per frame
-def __receive_rigid_body_frame(robot_id, position, rotation_quaternion):
+def receive_rigid_body_frame(robot_id, position, rotation_quaternion):
     # Position and rotation received
     positions[robot_id] = position
     # The rotation is in quaternion. We need to convert it to euler angles
@@ -25,7 +25,7 @@ class Position:
         self.streaming_client.set_server_address(optitrackServerAddress)
         self.streaming_client.set_use_multicast(True)
         # Configure the streaming client to call our rigid body handler on the emulator to send data out.
-        self.streaming_client.rigid_body_listener = __receive_rigid_body_frame
+        self.streaming_client.rigid_body_listener = receive_rigid_body_frame
         if not self.streaming_client.run():
             raise Exception("Not running")
 

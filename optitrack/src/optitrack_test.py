@@ -23,8 +23,8 @@ if __name__ == "__main__":
     # hostname = socket.gethostname()
     # ip_addr = socket.gethostbyname(hostname)
     clientAddress = "0.0.0.0"
-    optitrackServerAddress = "192.168.0.4"
-    robot_id = 207
+    optitrackServerAddress = "192.168.0.172"
+    robot_id = 307
 
     # This will create a new NatNet client
     streaming_client = NatNetClient()
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # This will run perpetually, and operate on a separate thread.
     is_running = streaming_client.run()
     while is_running:
-        print(positions.keys())
+        #print(positions.keys())
         if robot_id in positions:
             # last position
             print('Last position', positions[robot_id], ' rotation', rotations[robot_id])
