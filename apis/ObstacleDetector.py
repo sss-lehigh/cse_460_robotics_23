@@ -8,7 +8,8 @@ class ObstacleDetector:
     
     def sense(self):
         self.dist = self.sensor.get_distance()
-        if self.dist < 100:
+        if self.dist < 25:
+            print(self.dist)
             return True
         else:
             return False
@@ -26,3 +27,7 @@ class ObstacleDetector:
         res = np.dot(T, vec)
 
         return np.array([res[0], res[1]])
+
+    def get_node(self, x_t, angle, grid):
+        loc = self.get_loc(x_t, angle)
+        return grid.get_nearest_node(loc)

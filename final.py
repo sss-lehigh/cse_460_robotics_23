@@ -14,15 +14,21 @@ if __name__ == "__main__":
     position = Position("192.168.0.207", "192.168.0.172", 307)
     grid = Discretization(-3.3, -.26, -.46, 2.63)
 
+    print("Starting")
+
     x_d = np.array([0., 0.])
 
     x_t, angle = position.get()
 
     curr_node = grid.get_nearest_node(x_t)
 
-    path = grid.get_path(curr_node, 30)
+    print("Starting at", curr_node)
 
-    K1 = 1000
+    get_to = 0
+
+    path = grid.get_path(curr_node, get_to)
+
+    K1 = 1250
     K2 = 1500
 
     node_idx = 1
@@ -34,6 +40,13 @@ if __name__ == "__main__":
     init = np.zeros(2)
     slope = np.zeros(2)
 
+    while node_idx >= len(path):
+        get_to += 1
+        if get_to >= grid.num_nodes():
+            break
+        path = grid.get_path(curr_node, get_to)
+        print("Path from", curr_node, "to", get_to)
+    
     if node_idx < len(path):
         init = x_t
         slope = path[node_idx] - init
@@ -51,10 +64,10 @@ if __name__ == "__main__":
         while True:
 
             if state == State.EXPLORING: 
-
                 x_t, angle = position.get()
 
                 curr_time = time.time()
+                curr_node = grid.get_nearest_node(x_t)
 
                 if (curr_time - start) / factor > 1.0:
                     start = curr_time
@@ -63,8 +76,26 @@ if __name__ == "__main__":
                         init = x_t
                         slope = path[node_idx] - init
                     else:
-                        slope = np.zeros(2)
-                        init = path[-1]
+                        print("Updating path")
+                        node_idx = 1
+                        get_to += 1
+                        if get_to >= grid.num_nodes():
+                            get_to = 0
+                        print("Path from", curr_node, "to", get_to)
+                        path = grid.get_path(curr_node, get_to)
+
+                        while node_idx >= len(path):
+                            get_to += 1
+                            if get_to >= grid.num_nodes():
+                                get_to = 0
+                            print("Path from", curr_node, "to", get_to)
+                            path = grid.get_path(curr_node, get_to)
+                        if node_idx < len(path):
+                            init = x_t
+                            slope = path[node_idx] - init
+                        else:
+                            slope = np.zeros(2)
+                            init = path[-1]
 
                 x_d = ((curr_time - start) / factor) * slope + init
 

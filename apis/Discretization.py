@@ -10,6 +10,8 @@ class Discretization:
 
         grid_tmp = list()
 
+        self.removed = set()
+
         for x in list(x_vals):
             row = list()
             for y in list(y_vals):
@@ -59,7 +61,14 @@ class Discretization:
         return [self.G.nodes[p]['pos'] for p in path]
     
     def remove_node(self, node):
-        #self.G.remove_node(node)
+        print("Removed node", node)
+        self.removed.add(node)
         for edge in self.G.edges:
             if edge[0] == node or edge[1] == node:
                 self.G.edges[edge]['weight'] = len(self.G.nodes) * 2.0
+
+    def is_removed(self, node):
+        return node in self.removed
+    
+    def num_nodes(self):
+        return len(self.G.nodes)

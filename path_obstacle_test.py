@@ -49,27 +49,27 @@ if __name__ == "__main__":
             x_t, angle = position.get()
 
             if obstacle_detector.sense():
-                obstacle_loc = obstacle_detector.get_loc(x_t, angle)
-                obstacle_node = grid.get_nearest_node(obstacle_loc)
-                grid.remove_node(obstacle_node)
+                obstacle_node = obstacle_detector.get_node(x_t, angle, grid)
+                if not grid.is_removed(obstacle_node):
+                    grid.remove_node(obstacle_node)
 
-                curr_node = grid.get_nearest_node(x_t)
+                    curr_node = grid.get_nearest_node(x_t)
 
-                if curr_node == -1:
-                    print("Error with nearest node")
+                    if curr_node == -1:
+                        print("Error with nearest node")
 
-                node_idx = 1
+                    node_idx = 1
 
-                path = grid.get_path(curr_node, final_node)
+                    path = grid.get_path(curr_node, final_node)
 
-                if node_idx < len(path):
-                    init = x_t
-                    slope = path[node_idx] - init
-                else:
-                    slope = np.zeros(2)
-                    init = path[-1]
+                    if node_idx < len(path):
+                        init = x_t
+                        slope = path[node_idx] - init
+                    else:
+                        slope = np.zeros(2)
+                        init = path[-1]
 
-                start = time.time()
+                    start = time.time()
 
 
             curr_time = time.time()
