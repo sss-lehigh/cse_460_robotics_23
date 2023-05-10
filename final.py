@@ -28,9 +28,7 @@ if __name__ == "__main__":
 
     path = grid.get_path(curr_node, get_to)
 
-    K1 = 1250
-    K2 = 1500
-
+    
     node_idx = 1
 
     start = time.time()
@@ -60,10 +58,17 @@ if __name__ == "__main__":
 
     state = State.EXPLORING
 
+    led = Light()
+
+    led.set_blue()
+
     try:
         while True:
 
             if state == State.EXPLORING: 
+                K1 = 1250
+                K2 = 1500
+
                 x_t, angle = position.get()
 
                 curr_time = time.time()
