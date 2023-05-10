@@ -9,4 +9,4 @@ from Position import *
 from Robot import *
 from Discretization import *
 from ObstacleDetector import *
-from Light import *
+from RobotLight import *

@@ -1,20 +1,20 @@
-class Light:
+class RobotLight:
 
     def __init__(self):
         import Led
         self.led = Led.Led()
         self.clear()
 
-    def set_yellow(self):
+    def yellow(self):
         self.set_color(255, 255, 0)
 
-    def set_green(self):
+    def green(self):
         self.set_color(0, 255, 0)
 
-    def set_red(self):
+    def red(self):
         self.set_color(255, 0, 0)
 
-    def set_blue(self):
+    def blue(self):
         self.set_color(0, 0, 255)
 
     def clear(self):

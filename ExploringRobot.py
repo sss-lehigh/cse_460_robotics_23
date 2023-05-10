@@ -10,8 +10,8 @@ class ExploringRobot:
         self.K1 = K1
         self.K2 = K2
         self.start = time.time()
-        self.factor = 2.0
-        self.node_idx = 1
+        self.factor = 3.0
+        self.node_idx = 0
 
         x_t, _ = position.get()
 
@@ -23,6 +23,8 @@ class ExploringRobot:
 
         self.path = self.grid.get_path(curr_node, self.get_to)
         
+        print("Path from", curr_node, "to", self.get_to)
+
         self.init = np.zeros(2)
         self.slope = np.zeros(2)
 
@@ -50,11 +52,12 @@ class ExploringRobot:
             self.start = curr_time
             self.node_idx += 1
             if self.node_idx < len(self.path):
-                self.init = x_t
+                self.init = np.copy(x_t)
                 self.slope = self.path[self.node_idx] - self.init
+                print("Updated init and slope")
             else:
                 print("Updating path")
-                self.node_idx = 1
+                self.node_idx = 0
                 self.get_to += 1
                 if self.get_to >= self.grid.num_nodes():
                     self.get_to = 0
@@ -68,13 +71,15 @@ class ExploringRobot:
                     print("Path from", curr_node, "to", self.get_to)
                     self.path = self.grid.get_path(curr_node, self.get_to)
                 if self.node_idx < len(self.path):
-                    self.init = x_t
+                    self.init = np.copy(x_t)
                     self.slope = self.path[self.node_idx] - self.init
                 else:
                     self.slope = np.zeros(2)
-                    self.init = self.path[-1]
+                    self.init = np.copy(self.path[-1])
 
         x_d = ((curr_time - self.start) / self.factor) * self.slope + self.init
+
+        print(x_d)
 
         dist, desired = dist_and_angle(x_d, x_t)
 

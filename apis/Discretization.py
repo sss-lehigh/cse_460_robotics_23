@@ -43,8 +43,14 @@ class Discretization:
 
     def get_nearest_node(self, pos):
         arr = self.spindex.intersect((pos[0], pos[1], pos[0], pos[1]))
-        if len(arr) < 1:
-            return -1
+        factor = 0.1
+        count = 1
+        while len(arr) < 1:
+            print("Expanding search")
+            arr = self.spindex.intersect((pos[0] - count * factor, pos[1] - count * factor, pos[0] + count * factor, pos[1] + count * factor))
+            count += 1
+            if count > 100:
+                raise Exception("Error with get nearest")
         return self.__get_node_num(arr[0][0], arr[0][1]) 
 
     def get_node_loc(self, p):
