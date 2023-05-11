@@ -7,12 +7,16 @@ class Duck(Enum):
 
 class Camera:
 
-    def __init__(self, raspberrypi = False, read_img = False, img_name = ""):
-        
+    def __init__(self, raspberrypi = False, read_img = False, remote = False, **kwargs):
+        """
+        Set raspberrypi if running on raspberrypi.
+        Set read_img if reading an image then set img_name
+        Set remote if accessing a remote image then set port and ip_addr
+        """
         self.rpi = raspberrypi
       
         self.read_img = read_img
-        self.img_name = img_name
+        self.img_name = kwargs["img_name"]
 
         if not read_img:
 
@@ -21,14 +25,23 @@ class Camera:
                 self.camera = Picamera2()
                 self.camera.configure(self.camera.create_preview_configuration(main={"format": 'XRGB8888', "size": (640, 480)}))
                 self.camera.start()
+            elif remote:
+                print("Connecting to:","http://" + kwargs["ip_addr"] + ":" + str(kwargs["port"]) + "/stream.mjpg")
+                self.camera = cv2.VideoCapture("http://" + kwargs["ip_addr"] + ":" + str(kwargs["port"]) + "/stream.mjpg")
             else:
                 self.camera = cv2.VideoCapture(0)
     
     def close(self):
+        """
+        Close camera
+        """
         if not self.rpi and not self.read_img:
             self.camera.release()
 
     def get(self):
+        """
+        Get a frame
+        """
         if self.read_img:
             img = cv2.imread(self.img_name)
             return cv2.resize(img, (640, 480))
@@ -39,6 +52,9 @@ class Camera:
             return frame
 
     def get_blobs_and_gray(self, color = Duck.SMALL_DUCK):
+        """
+        Get the blobs and the gray frame
+        """
         frame = self.get()
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         # 95 to 125 for HUE
@@ -116,10 +132,16 @@ class Camera:
         return np.array([blobs]), im_with_keypoints
     
     def get_blobs(self, color = Duck.SMALL_DUCK):
+        """
+        Get the blobs
+        """
         blobs, _ = self.get_blobs_and_gray(color)
         return blobs
     
     def get_largest_blob(self, color = Duck.SMALL_DUCK):
+        """
+        Get the largest blob
+        """
         blobs = self.get_blobs(color)
         
         if blobs is not None:
@@ -138,6 +160,9 @@ class Camera:
             return None
  
     def get_largest_blob_and_img(self, color = Duck.SMALL_DUCK):
+        """
+        Get the largest blob and the image
+        """
         blobs, gray = self.get_blobs_and_gray(color)
         
         if blobs is not None:
