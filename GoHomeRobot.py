@@ -51,14 +51,14 @@ class GoHomeRobot:
             if self.node_idx < len(self.path):
                 self.init = np.copy(x_t)
                 self.slope = self.path[self.node_idx] - self.init
-                print("Updated init and slope")
+                #print("Updated init and slope")
             else:
                 self.slope = np.zeros(2)
                 self.init = np.copy(self.path[-1])
 
         x_d = ((curr_time - self.start) / self.factor) * self.slope + self.init
 
-        print(x_d)
+        #print(x_d)
 
         dist, desired = dist_and_angle(x_d, x_t)
 

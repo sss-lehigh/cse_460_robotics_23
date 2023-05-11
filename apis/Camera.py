@@ -16,7 +16,9 @@ class Camera:
         self.rpi = raspberrypi
       
         self.read_img = read_img
-        self.img_name = kwargs["img_name"]
+        self.img_name = ""
+        if self.read_img:
+            self.img_name = kwargs["img_name"]
 
         if not read_img:
 
