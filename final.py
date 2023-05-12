@@ -6,7 +6,7 @@ from CaptureRobot import *
 from GoHomeRobot import *
 from DropOffRobot import *
 from Distribution import *
-import socket
+import json
 
 other_died = False
 
@@ -17,21 +17,24 @@ class State(Enum):
     DROP_OFF = 4
 
 if __name__ == "__main__":
+    f = open("./config.json")
+    config = json.load(f)
+    f.close()
 
-    socket.setdefaulttimeout(1.0)
-
-    robot = RemoteRobot("192.168.0.207") 
-    position = Position("192.168.0.164", "192.168.0.172", 307)
-    camera = Camera(remote = True, port = 8080, ip_addr = "192.168.0.207")
+    robot = RemoteRobot(config["robot_ip"]) 
+    position = Position(config["local_ip"], "192.168.0.172", config["robot_id"])
+    camera = Camera(remote = True, port = 8080, ip_addr = config["robot_ip"])
     
     heartbeat_server = DistributionServer(8090)
-    other_computer = "192.168.0.153"
-    heartbeat_manager = Distribution(heartbeat_server, {0 : "https://" + other_computer + ":8090"})
+    other_computer = config["other_computer_ip"]
+    heartbeat_manager = Distribution(heartbeat_server, {0 : "http://" + other_computer + ":8090"})
 
     while True:
         try:
             if heartbeat_manager.call(0, "heartbeat"):
                 break
+        except KeyboardInterrupt:
+            os._exit(0)
         except Exception:
             pass
         time.sleep(1)
@@ -42,8 +45,8 @@ if __name__ == "__main__":
             try:
                 heartbeat_manager.call(0, "heartbeat")
                 time.sleep(5)
-            except Exception:
-                print("Failure")
+            except Exception as e:
+                print("Failure", e)
                 other_died = True
                 return
 
