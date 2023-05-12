@@ -1,6 +1,7 @@
 {
     "local_ip" : "192.168.0.164",
-    "robot_ip" : "192.168.0.207",
-    "robot_id" : 307,
-    "other_computer_ip" : "192.168.0.153"
+    "robot_ip" : "192.168.0.209",
+    "robot_id" : 209,
+    "other_computer_ip" : "192.168.0.153",
+    "distribute" : false
 }

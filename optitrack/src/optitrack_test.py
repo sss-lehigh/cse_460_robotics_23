@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # This will run perpetually, and operate on a separate thread.
     is_running = streaming_client.run()
     while is_running:
-        #print(positions.keys())
+        print(positions.keys())
         if robot_id in positions:
             # last position
             print('Last position', positions[robot_id], ' rotation', rotations[robot_id])

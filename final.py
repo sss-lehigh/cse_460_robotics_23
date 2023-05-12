@@ -24,34 +24,36 @@ if __name__ == "__main__":
     robot = RemoteRobot(config["robot_ip"]) 
     position = Position(config["local_ip"], "192.168.0.172", config["robot_id"])
     camera = Camera(remote = True, port = 8080, ip_addr = config["robot_ip"])
-    
-    heartbeat_server = DistributionServer(8090)
-    other_computer = config["other_computer_ip"]
-    heartbeat_manager = Distribution(heartbeat_server, {0 : "http://" + other_computer + ":8090"})
 
-    while True:
-        try:
-            if heartbeat_manager.call(0, "heartbeat"):
-                break
-        except KeyboardInterrupt:
-            os._exit(0)
-        except Exception:
-            pass
-        time.sleep(1)
+    if config["distribute"]:
 
-    def heartbeat_target():
-        global other_died
+        heartbeat_server = DistributionServer(8090)
+        other_computer = config["other_computer_ip"]
+        heartbeat_manager = Distribution(heartbeat_server, {0 : "http://" + other_computer + ":8090"})
+
         while True:
             try:
-                heartbeat_manager.call(0, "heartbeat")
-                time.sleep(5)
-            except Exception as e:
-                print("Failure", e)
-                other_died = True
-                return
+                if heartbeat_manager.call(0, "heartbeat"):
+                    break
+            except KeyboardInterrupt:
+                os._exit(0)
+            except Exception:
+                pass
+            time.sleep(1)
 
-    t = threading.Thread(target = heartbeat_target)
-    t.start()
+        def heartbeat_target():
+            global other_died
+            while True:
+                try:
+                    heartbeat_manager.call(0, "heartbeat")
+                    time.sleep(5)
+                except Exception as e:
+                    print("Failure", e)
+                    other_died = True
+                    return
+
+        t = threading.Thread(target = heartbeat_target)
+        t.start()
 
     grid = Discretization(-3.3, -.26, -.46, 2.63)
     home_node = 0
@@ -68,7 +70,7 @@ if __name__ == "__main__":
 
     state = State.EXPLORING
 
-     
+    print("Here") 
 
     #led = RobotLight()
 
@@ -78,6 +80,7 @@ if __name__ == "__main__":
         while True:
 
             if state == State.EXPLORING: 
+                print("Here")
                 if camera.get_largest_blob() is not None:
                     robot.stop_motor()
                     print("Switching to capture")
@@ -85,6 +88,7 @@ if __name__ == "__main__":
                     capture = CaptureRobot(robot, position, camera)
                     exploring = None
                     continue
+                print("Fuck")
                 exploring.step()
             elif state == State.CAPTURING:
                 res = capture.step()
