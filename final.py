@@ -5,6 +5,9 @@ from ExploringRobot import *
 from CaptureRobot import *
 from GoHomeRobot import *
 from DropOffRobot import *
+from Distribution import *
+
+other_died = False
 
 class State(Enum):
     EXPLORING = 1
@@ -17,6 +20,21 @@ if __name__ == "__main__":
     robot = RemoteRobot("192.168.0.207") 
     position = Position("192.168.0.164", "192.168.0.172", 307)
     camera = Camera(remote = True, port = 8080, ip_addr = "192.168.0.207")
+    
+    heartbeat_server = DistributionServer(8090)
+    other_computer = "192.168.0.164"
+    heartbeat_manager = Distribution(heartbeat_server, {0 : "https://" + other_computer + ":8090"})
+
+    def heartbeat_target():
+        global other_died
+        while True:
+            try:
+                heartbeat_manager.call(0, "heartbeat")
+            except Exception:
+                print("Failure")
+                other_died = True
+
+    threading.Thread(target = heartbeat_target)
 
     grid = Discretization(-3.3, -.26, -.46, 2.63)
     home_node = 0
@@ -47,7 +65,7 @@ if __name__ == "__main__":
                     robot.stop_motor()
                     print("Switching to capture")
                     state = State.CAPTURING
-                    capture = CaptureRobot(robot, camera)
+                    capture = CaptureRobot(robot, position, camera)
                     exploring = None
                     continue
                 exploring.step()

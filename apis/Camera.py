@@ -3,7 +3,7 @@ import cv2
 from enum import Enum
 
 class Duck(Enum):
-    SMALL_DUCK = ([0, 78, 185],[32, 255, 255])
+    SMALL_DUCK = ([0,183,171],[179,255,255])#([0, 78, 185],[32, 255, 255])
 
 class Camera:
 
@@ -99,8 +99,8 @@ class Camera:
         params.maxArea = 2**64
          
         # Filter by Circularity
-        params.filterByCircularity = False
-        params.minCircularity = 0.1
+        params.filterByCircularity = True
+        params.minCircularity = 0.3
          
         # Filter by Convexity
         params.filterByConvexity = False

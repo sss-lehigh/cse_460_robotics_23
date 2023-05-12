@@ -25,10 +25,15 @@ class CaptureRobot:
         self.have_angle = False
         self.angle = 0.0
         self.K2 = 1500.0
+        self.timeout = 5.0
+        self.timeout_start = time.time()
 
         
     def step(self) -> CaptureSolution:
         """ Returns true when done """
+
+        if not self.ramming and time.time() - self.timeout_start > self.timeout:
+            return CaptureSolution.FAILED
 
         w = 0.0
         v = 0.0
@@ -42,7 +47,6 @@ class CaptureRobot:
             if blob is not None:
                 _, opt_angle = self.position.get()
                 print(theta_duck(blob[0]), opt_angle)
-                return CaptureSolution.FAILED
                 self.angle = np.arctan2(np.sin(theta_duck(blob[0]) + opt_angle), np.cos(theta_duck(blob[0]) + opt_angle))
                 print(self.angle)
                 self.have_angle = True
@@ -55,7 +59,7 @@ class CaptureRobot:
             _, opt_angle = self.position.get()
             
             print("Angle diff is", angle_diff(self.angle, opt_angle), self.angle, opt_angle)
-            if abs(angle_diff(self.angle, opt_angle)) < 0.07:
+            if abs(angle_diff(self.angle, opt_angle)) < 0.02:
                 #print("Ramming it", 320.0 - blob[0])
                 w = 0.0
                 v = 1500.0
