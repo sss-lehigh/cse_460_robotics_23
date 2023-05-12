@@ -6,6 +6,7 @@ from CaptureRobot import *
 from GoHomeRobot import *
 from DropOffRobot import *
 from Distribution import *
+import socket
 
 other_died = False
 
@@ -16,25 +17,38 @@ class State(Enum):
     DROP_OFF = 4
 
 if __name__ == "__main__":
-   
+
+    socket.setdefaulttimeout(1.0)
+
     robot = RemoteRobot("192.168.0.207") 
     position = Position("192.168.0.164", "192.168.0.172", 307)
     camera = Camera(remote = True, port = 8080, ip_addr = "192.168.0.207")
     
     heartbeat_server = DistributionServer(8090)
-    other_computer = "192.168.0.164"
+    other_computer = "192.168.0.153"
     heartbeat_manager = Distribution(heartbeat_server, {0 : "https://" + other_computer + ":8090"})
+
+    while True:
+        try:
+            if heartbeat_manager.call(0, "heartbeat"):
+                break
+        except Exception:
+            pass
+        time.sleep(1)
 
     def heartbeat_target():
         global other_died
         while True:
             try:
                 heartbeat_manager.call(0, "heartbeat")
+                time.sleep(5)
             except Exception:
                 print("Failure")
                 other_died = True
+                return
 
-    threading.Thread(target = heartbeat_target)
+    t = threading.Thread(target = heartbeat_target)
+    t.start()
 
     grid = Discretization(-3.3, -.26, -.46, 2.63)
     home_node = 0
