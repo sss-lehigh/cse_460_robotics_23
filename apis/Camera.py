@@ -3,7 +3,7 @@ import cv2
 from enum import Enum
 
 class Duck(Enum):
-    SMALL_DUCK = ([0,183,171],[179,255,255])#([0, 78, 185],[32, 255, 255])
+    SMALL_DUCK =  ([0,183,171],[179,255,255]) #([0, 78, 185],[32, 255, 255])
 
 class Camera:
 
@@ -181,4 +181,21 @@ class Camera:
             return (max_circle, gray)
         else:
             return (None, gray)
+
+
+if __name__ == "__main__":
     
+    camera = Camera(remote = True, port = 8080, ip_addr = "192.168.0.207")
+
+    try:
+        while True: 
+            _, img = camera.get_largest_blob_and_img()
+            cv2.imshow('frame', img)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+    except KeyboardInterrupt as e:
+        print("Sending stop")
+
+    camera.close() 
+    cv2.destroyAllWindows()

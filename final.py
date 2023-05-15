@@ -19,18 +19,55 @@ class State(Enum):
 if __name__ == "__main__":
     f = open("./config.json")
     config = json.load(f)
+
+    print("Using config:")
+    print(config)
+
     f.close()
 
     robot = RemoteRobot(config["robot_ip"]) 
-    position = Position(config["local_ip"], "192.168.0.172", config["robot_id"])
-    camera = Camera(remote = True, port = 8080, ip_addr = config["robot_ip"])
+    position = Position(config["local_ip"], config["opt_track"], config["robot_id"])
+    camera_thread = CameraThread(Camera(remote = True, port = 8080, ip_addr = config["robot_ip"]))
+
+    grid = Discretization(-3.9, 5.7, -2.16, 3.29) #Discretization(-3.3, -.26, -.46, 2.63)
+    
+    home_node = 73
+    safe_nodes = [73, 58, 44, 74]
+    safe_node_border = [72, 73, 58, 44, 74, 43, 57, 42, 88, 89, 87, 59]
+    obstacles = []
+
+    for x in obstacles:
+        grid.remove_node(x)
+
+    robot.stop_motor()
+    
+    # 1250, 1500 should start by going to node 0
+    exploring = None
+    capture = None
+    go_home = None
+    drop_off = None
+
+    nodes = list()
 
     if config["distribute"]:
+
+        first_half = config["first_half"]
 
         heartbeat_server = DistributionServer(8090)
         other_computer = config["other_computer_ip"]
         heartbeat_manager = Distribution(heartbeat_server, {0 : "http://" + other_computer + ":8090"})
-
+        
+        
+        if first_half:
+            for i in range(0, grid.num_nodes() / 2):
+                if i not in obstacles and i not in safe_nodes:
+                    nodes.append(i)
+        else:
+            for i in range(grid.num_nodes() / 2, grid.num_nodes()):
+                if i not in obstacles and i not in safe_nodes:
+                    nodes.append(i)
+    
+        exploring = ExploringRobot(robot, position, grid, 1250, 1500, 0, nodes)
         while True:
             try:
                 if heartbeat_manager.call(0, "heartbeat"):
@@ -55,18 +92,14 @@ if __name__ == "__main__":
         t = threading.Thread(target = heartbeat_target)
         t.start()
 
-    grid = Discretization(-3.3, -.26, -.46, 2.63)
-    home_node = 0
-
+    else:
+        for i in range(0, grid.num_nodes()):
+            if i not in obstacles and i not in safe_nodes:
+                nodes.append(i)
+        exploring = ExploringRobot(robot, position, grid, 1250, 1500, 0, nodes)
+    
     print("Starting")
-
-    robot.stop_motor()
-
-    # 1250, 1500
-    exploring = ExploringRobot(robot, position, grid, 1250, 1500, 0)
-    capture = None
-    go_home = None
-    drop_off = None
+    camera_thread.start()
 
     state = State.EXPLORING
 
@@ -76,20 +109,32 @@ if __name__ == "__main__":
 
     #led.blue()
 
+    curr_explore_node = 0
+
     try:
         while True:
 
-            if state == State.EXPLORING: 
-                print("Here")
-                if camera.get_largest_blob() is not None:
-                    robot.stop_motor()
-                    print("Switching to capture")
-                    state = State.CAPTURING
-                    capture = CaptureRobot(robot, position, camera)
-                    exploring = None
-                    continue
-                print("Fuck")
-                exploring.step()
+            if other_died:
+                print("Updating explore robot")
+                nodes.clear()
+                for i in range(0, grid.num_nodes()):
+                    if i not in obstacles and i not in safe_nodes:
+                        nodes.append(i)
+                if state == State.EXPLORING:
+                    exploring = ExploringRobot(robot, position, grid, 1250, 1500, curr_explore_node, nodes)
+
+            if state == State.EXPLORING:
+                x_t, _ = position.get()
+                if grid.get_nearest_node(x_t) not in safe_node_border:
+                    if camera_thread.blob is not None:
+                        robot.stop_motor()
+                        print("Switching to capture")
+                        state = State.CAPTURING
+                        capture = CaptureRobot(robot, position, camera_thread)
+                        exploring = None
+                        print("Was exploring", curr_explore_node)
+                        continue
+                curr_explore_node = exploring.step()
             elif state == State.CAPTURING:
                 res = capture.step()
                 if res is CaptureSolution.FINISHED:
@@ -102,7 +147,8 @@ if __name__ == "__main__":
                     state = State.EXPLORING
                     capture = None
                     x_t, _ = position.get()
-                    exploring = ExploringRobot(robot, position, grid, 1250, 1500, grid.get_nearest_node(x_t))
+                    # exploring robot starts going to nearest node
+                    exploring = ExploringRobot(robot, position, grid, 1250, 1500, curr_explore_node, nodes)
             elif state == State.RETURNING_TO_SAFETY:
                 if go_home.step():
                     print("Switching to drop off")
@@ -115,7 +161,8 @@ if __name__ == "__main__":
                     state = State.EXPLORING
                     drop_off = None
                     x_t, _ = position.get()
-                    exploring = ExploringRobot(robot, position, grid, 1250, 1500, grid.get_nearest_node(x_t))
+                    # exploring robot starts going to nearest node
+                    exploring = ExploringRobot(robot, position, grid, 1250, 1500, curr_explore_node, nodes)
             else:
                 print("Error")
 
@@ -126,5 +173,7 @@ if __name__ == "__main__":
         robot.set_motor(0.0, 0.0, 0.0, 0.0)
         robot.stop_motor()
         robot.shutdown()
+        camera_thread.signal_thread()
+        camera_thread.join()
 
     os._exit(0)

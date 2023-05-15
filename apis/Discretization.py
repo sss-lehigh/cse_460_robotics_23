@@ -78,3 +78,21 @@ class Discretization:
     
     def num_nodes(self):
         return len(self.G.nodes)
+    
+if __name__ == "__main__":
+    import Position
+    import os
+    import time
+    position = Position.Position("0.0.0.0", "192.168.0.4", 307)
+    grid = Discretization(-3.9, 5.7, -2.16, 3.29) #Discretization(-3.3, -.26, -.46, 2.63)
+    try:
+        while True:
+            x_t, angle = position.get()
+            print(x_t, angle, grid.get_nearest_node(x_t))
+            time.sleep(0.1)
+    except KeyboardInterrupt:
+        pass
+    os._exit(0)
+
+    # 73, 58, 44, 74, 
+    # 43, 57, 42, 88, 89, 87, 59 on outside
