@@ -25,6 +25,9 @@ class ExploringRobot:
 
         self.get_to = start_node
 
+        if self.get_to >= len(self.nodes):
+            self.get_to = 0
+
         self.path = self.grid.get_path(curr_node, self.nodes[self.get_to])
         
         print("Path from", curr_node, "to", self.nodes[self.get_to])

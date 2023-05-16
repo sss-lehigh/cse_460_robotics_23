@@ -72,7 +72,7 @@ if __name__ == "__main__":
             for i in range(int(grid.num_nodes() / 2), int(grid.num_nodes())):
                 if i not in obstacles and i not in safe_nodes:
                     nodes.append(i)
-    
+        print(nodes) 
         exploring = ExploringRobot(robot, position, grid, K1, K2, 0, nodes)
         while True:
             try:
