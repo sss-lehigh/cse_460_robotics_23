@@ -65,11 +65,11 @@ if __name__ == "__main__":
         
         
         if first_half:
-            for i in range(0, grid.num_nodes() / 2):
+            for i in range(0, int(grid.num_nodes() / 2)):
                 if i not in obstacles and i not in safe_nodes:
                     nodes.append(i)
         else:
-            for i in range(grid.num_nodes() / 2, grid.num_nodes()):
+            for i in range(int(grid.num_nodes() / 2), int(grid.num_nodes())):
                 if i not in obstacles and i not in safe_nodes:
                     nodes.append(i)
     
