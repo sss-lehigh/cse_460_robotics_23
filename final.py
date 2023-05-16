@@ -50,8 +50,8 @@ if __name__ == "__main__":
     go_home = None
     drop_off = None
 
-    K1 = 1250
-    K2 = 1500
+    K1 = 1000 #1250
+    K2 = 1250 #1500
 
     nodes = list()
 
