@@ -17,7 +17,7 @@ class GoHomeRobot:
 
         x_t, _ = position.get()
 
-        curr_node = self.grid.get_nearest_node(x_t)
+        curr_node, _ = self.grid.get_nearest_node(x_t)
 
         print("Starting at", curr_node)
 
@@ -39,7 +39,7 @@ class GoHomeRobot:
         x_t, angle = self.position.get()
 
         curr_time = time.time()
-        curr_node = self.grid.get_nearest_node(x_t)
+        curr_node, _ = self.grid.get_nearest_node(x_t)
 
         if curr_node == self.home_node:
             self.robot.set_motor(0, 0, 0, 0)

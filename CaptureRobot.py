@@ -97,7 +97,10 @@ class CaptureRobot:
                         sign = 1.0
                     w = sign * 800.0 #self.K2 * angle_diff(self.angle, angle)
                     v = 0.0
-                    print("Rotating", w)
+                    print("Rotating to align", w)
+            else:
+                w = 800.0
+                v = 0.0
 
         elif self.ramming and time.time() - self.start < self.ram_time:
             print("Ramming")

@@ -30,4 +30,4 @@ class ObstacleDetector:
 
     def get_node(self, x_t, angle, grid):
         loc = self.get_loc(x_t, angle)
-        return grid.get_nearest_node(loc)
+        return grid.get_nearest_node(loc)[0]

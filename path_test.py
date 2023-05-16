@@ -16,7 +16,7 @@ if __name__ == "__main__":
     print("Here")
 
 
-    curr_node = grid.get_nearest_node(x_t)
+    curr_node, _ = grid.get_nearest_node(x_t)
 
     path = grid.get_path(curr_node, 30)
 

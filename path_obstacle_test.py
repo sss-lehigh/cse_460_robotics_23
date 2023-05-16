@@ -11,7 +11,7 @@ if __name__ == "__main__":
     
     x_t, angle = position.get()
 
-    curr_node = grid.get_nearest_node(x_t)
+    curr_node, _ = grid.get_nearest_node(x_t)
 
     print(curr_node)
     final_node = 15
@@ -53,7 +53,7 @@ if __name__ == "__main__":
                 if not grid.is_removed(obstacle_node):
                     grid.remove_node(obstacle_node)
 
-                    curr_node = grid.get_nearest_node(x_t)
+                    curr_node, _ = grid.get_nearest_node(x_t)
 
                     if curr_node == -1:
                         print("Error with nearest node")

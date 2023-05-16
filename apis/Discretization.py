@@ -45,14 +45,16 @@ class Discretization:
         arr = self.spindex.intersect((pos[0], pos[1], pos[0], pos[1]))
         factor = 0.1
         count = 1
+        oob = False
         while len(arr) < 1:
+            oob = True
             print("Expanding search")
             arr = self.spindex.intersect((pos[0] - count * factor, pos[1] - count * factor, pos[0] + count * factor, pos[1] + count * factor))
             count += 1
             if count > 100:
                 raise Exception("Error with get nearest")
-        return self.__get_node_num(arr[0][0], arr[0][1]) 
-
+        return (self.__get_node_num(arr[0][0], arr[0][1]), oob)
+   
     def get_node_loc(self, p):
         return self.G.nodes[p]['pos'] 
 
@@ -96,3 +98,5 @@ if __name__ == "__main__":
 
     # 73, 58, 44, 74, 
     # 43, 57, 42, 88, 89, 87, 59 on outside
+
+    # 39, 24, 23, 22, 21, 36, 37, 38, 85, 100, 99, 114, 98, 97, 82, 83, 84, 69, 68, 78, 79, 94

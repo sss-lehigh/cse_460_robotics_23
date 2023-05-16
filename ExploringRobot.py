@@ -16,7 +16,10 @@ class ExploringRobot:
 
         x_t, _ = position.get()
 
-        curr_node = self.grid.get_nearest_node(x_t)
+        curr_node, oob = self.grid.get_nearest_node(x_t)
+
+        #if not oob:
+        #    self.node_idx = 1
 
         print("Starting at", curr_node)
 
@@ -47,7 +50,7 @@ class ExploringRobot:
         x_t, angle = self.position.get()
 
         curr_time = time.time()
-        curr_node = self.grid.get_nearest_node(x_t)
+        curr_node, oob = self.grid.get_nearest_node(x_t)
 
         if (curr_time - self.start) / self.factor > 1.0:
             self.start = curr_time
@@ -58,6 +61,10 @@ class ExploringRobot:
                 #print("Updated init and slope")
             else:
                 #print("Updating path")
+                #if oob:
+                #    self.node_idx = 0
+                #else:
+                #    self.node_idx = 1
                 self.node_idx = 0
                 self.get_to += 1
                 if self.get_to >= len(self.nodes):
@@ -75,6 +82,7 @@ class ExploringRobot:
                     self.init = np.copy(x_t)
                     self.slope = self.path[self.node_idx] - self.init
                 else:
+                    print("Set to a point")
                     self.slope = np.zeros(2)
                     self.init = np.copy(self.path[-1])
 
@@ -85,7 +93,7 @@ class ExploringRobot:
         dist, desired = dist_and_angle(x_d, x_t)
 
         delta_angle = angle_diff(desired, angle)
-
+        
         v = self.K1 * dist
         w = self.K2 * delta_angle
         u = np.array([v - w, v + w])

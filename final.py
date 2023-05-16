@@ -34,7 +34,7 @@ if __name__ == "__main__":
     home_node = 73
     safe_nodes = [73, 58, 44, 74]
     safe_node_border = [72, 73, 58, 44, 74, 43, 57, 42, 88, 89, 87, 59]
-    obstacles = []
+    obstacles = [39, 24, 23, 22, 21, 36, 37, 38, 85, 100, 99, 114, 98, 97, 82, 83, 84, 69, 68, 78, 79, 94]
 
     for x in obstacles:
         grid.remove_node(x)
@@ -46,6 +46,9 @@ if __name__ == "__main__":
     capture = None
     go_home = None
     drop_off = None
+
+    K1 = 1250
+    K2 = 1500
 
     nodes = list()
 
@@ -67,7 +70,7 @@ if __name__ == "__main__":
                 if i not in obstacles and i not in safe_nodes:
                     nodes.append(i)
     
-        exploring = ExploringRobot(robot, position, grid, 1250, 1500, 0, nodes)
+        exploring = ExploringRobot(robot, position, grid, K1, K2, 0, nodes)
         while True:
             try:
                 if heartbeat_manager.call(0, "heartbeat"):
@@ -96,7 +99,7 @@ if __name__ == "__main__":
         for i in range(0, grid.num_nodes()):
             if i not in obstacles and i not in safe_nodes:
                 nodes.append(i)
-        exploring = ExploringRobot(robot, position, grid, 1250, 1500, 0, nodes)
+        exploring = ExploringRobot(robot, position, grid, K1, K2, 0, nodes)
     
     print("Starting")
     camera_thread.start()
@@ -121,7 +124,7 @@ if __name__ == "__main__":
                     if i not in obstacles and i not in safe_nodes:
                         nodes.append(i)
                 if state == State.EXPLORING:
-                    exploring = ExploringRobot(robot, position, grid, 1250, 1500, curr_explore_node, nodes)
+                    exploring = ExploringRobot(robot, position, grid, K1, K2, curr_explore_node, nodes)
 
             if state == State.EXPLORING:
                 x_t, _ = position.get()
@@ -141,14 +144,14 @@ if __name__ == "__main__":
                     print("Switching to going home")
                     state = State.RETURNING_TO_SAFETY
                     capture = None
-                    go_home = GoHomeRobot(robot, position, grid, 1250, 1500, home_node)
+                    go_home = GoHomeRobot(robot, position, grid, K1, K2, home_node)
                 elif res is CaptureSolution.FAILED:
                     print("Switching to explore")
                     state = State.EXPLORING
                     capture = None
                     x_t, _ = position.get()
                     # exploring robot starts going to nearest node
-                    exploring = ExploringRobot(robot, position, grid, 1250, 1500, curr_explore_node, nodes)
+                    exploring = ExploringRobot(robot, position, grid, K1, K2, curr_explore_node, nodes)
             elif state == State.RETURNING_TO_SAFETY:
                 if go_home.step():
                     print("Switching to drop off")
@@ -162,7 +165,7 @@ if __name__ == "__main__":
                     drop_off = None
                     x_t, _ = position.get()
                     # exploring robot starts going to nearest node
-                    exploring = ExploringRobot(robot, position, grid, 1250, 1500, curr_explore_node, nodes)
+                    exploring = ExploringRobot(robot, position, grid, K1, K2, curr_explore_node, nodes)
             else:
                 print("Error")
 
