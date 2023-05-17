@@ -59,10 +59,9 @@ if __name__ == "__main__":
 
         first_half = config["first_half"]
 
-        heartbeat_server = DistributionServer(8090)
+        heartbeat_server = DistributionServer(int(config["self_port"]))
         other_computer = config["other_computer_ip"]
-        heartbeat_manager = Distribution(heartbeat_server, {0 : "http://" + other_computer + ":8090"})
-        
+        heartbeat_manager = Distribution(heartbeat_server, {0 : "http://" + other_computer + ":" + config["other_port"]})
         
         if first_half:
             for i in range(0, int(grid.num_nodes() / 2)):
@@ -128,6 +127,7 @@ if __name__ == "__main__":
                         nodes.append(i)
                 if state == State.EXPLORING:
                     exploring = ExploringRobot(robot, position, grid, K1, K2, curr_explore_node, nodes)
+                other_died = False
 
             if state == State.EXPLORING:
                 x_t, _ = position.get()

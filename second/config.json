@@ -1,11 +1,11 @@
 {
     "local_ip" : "192.168.0.28",
-    "robot_ip" : "192.168.0.207",
-    "robot_id" : 307,
+    "robot_ip" : "192.168.0.212",
+    "robot_id" : 212,
     "other_computer_ip" : "192.168.0.28",
     "opt_track" : "192.168.0.4",
     "distribute" : true,
-    "first_half" : false,
-    "self_port" : "8091",
-    "other_port" : "8090"
+    "first_half" : true,
+    "self_port" : "8090",
+    "other_port" : "8091"
 }
